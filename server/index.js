@@ -1,10 +1,18 @@
-const ws = require('ws')
+import {createServer } from 'http'
+import {Server}  from "socket.io"
 
-const server = new ws.Server({port: 3000})
+const httpServer = createServer();
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.NODE_ENV === 'production' ? false: ["http://localhost:5500"],
+    }
+})
 
-server.on('connection', socket => {
+
+io.on('connection', socket => {
+    console.log(`User Id: ${socket.id} connected`)
     socket.on('message', message => {
         console.log(message)
-        socket.send(`${message}`)
+        io.emit('message', `${message}`)
     })
 })
